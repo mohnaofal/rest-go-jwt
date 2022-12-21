@@ -12,16 +12,6 @@ import (
 	"github.com/mohnaofal/rest-go-jwt/repository"
 )
 
-// CustomValidator ...
-type CustomValidator struct {
-	validator *validator.Validate
-}
-
-// Validate ...
-func (cv *CustomValidator) Validate(i interface{}) error {
-	return cv.validator.Struct(i)
-}
-
 func main() {
 	err := godotenv.Load()
 	if err != nil {
@@ -39,10 +29,20 @@ func main() {
 	// validator
 	e.Validator = &CustomValidator{validator: validator.New()}
 
-	userRepositori := repository.NewUserRepository(cfg)
-	userController := controller.NewUserController(userRepositori)
+	userRepository := repository.NewUserRepository(cfg)
+	userController := controller.NewUserController(userRepository)
 	userGroup := e.Group("v1/user")
 	userController.Apply(userGroup)
 
 	e.Logger.Fatal(e.Start(":8080"))
+}
+
+// CustomValidator ...
+type CustomValidator struct {
+	validator *validator.Validate
+}
+
+// Validate ...
+func (cv *CustomValidator) Validate(i interface{}) error {
+	return cv.validator.Struct(i)
 }
